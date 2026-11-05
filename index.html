@@ -1025,5 +1025,14 @@
 
     <!-- SCRIPT PRINCIPAL -->
     <script src="app.js"></script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('./sw.js')
+            .then(reg => console.log('Service Worker registrado con éxito:', reg.scope))
+            .catch(err => console.warn('Fallo al registrar el Service Worker:', err));
+        });
+      }
+    </script>
 </body>
 </html>
