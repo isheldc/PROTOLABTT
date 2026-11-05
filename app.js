@@ -744,23 +744,25 @@ function addActivity(description) {
 }
 
 function updateProgress() {
-    const expCountEl = $("experimentCount");
-    const quizScoreEl = $("quizScore");
+    // Corregido para apuntar a los IDs correctos de index.html
+    const expCountEl = $("totalExperiments");
+    const quizScoreEl = $("correctAnswersDisplay");
+    
     if (expCountEl) expCountEl.textContent = experiments;
     if (quizScoreEl) quizScoreEl.textContent = correctAnswers;
 
-    const container = $("activityHistory");
+    const container = $("historyList");
     if (!container) return;
 
     if (history.length === 0) {
-        container.textContent = "Todavía no tienes actividades registradas.";
+        container.innerHTML = `<p style="color:var(--muted); font-size:14px;">Todavía no has realizado ninguna actividad en esta sesión.</p>`;
         return;
     }
 
     container.innerHTML = history.map(item => `
-        <div class="history-item">
-            <strong>${escapeHTML(item.description)}</strong>
-            <small>${escapeHTML(item.date)}</small>
+        <div class="history-item" style="padding: 8px 0; border-bottom: 1px solid var(--border);">
+            <strong>${escapeHTML(item.description)}</strong><br>
+            <small style="color:var(--muted);">${escapeHTML(item.date)}</small>
         </div>
     `).join("");
 }
@@ -2742,8 +2744,27 @@ if (restartQuizBtn) {
 // NEXOR-IA: ASISTENTE EDUCATIVO
 // ==========================================
 function getAIResponse(question) {
-    const text = question.toLowerCase();
+    const text = question.toLowerCase().trim();
 
+    // === PEGA AQUÍ TUS NUEVAS VALIDACIONES EXACTAS ===
+    if (/^(gracias|muchas gracias|te agradezco|gracias por tu ayuda)[!. ]*$/.test(text)) {
+        return "¡Con gusto! Me alegra ayudarte a aprender. ¿Qué otro tema científico te gustaría explorar?";
+    }
+
+    if (/^(adios|hasta luego|nos vemos|bye|hasta pronto)[!. ]*$/.test(text)) {
+        return "¡Hasta pronto! Sigue explorando y aprendiendo en Nexora LAB. Aquí podrás continuar tus descubrimientos científicos.";
+    }
+
+    if (/^(quien eres|como te llamas|que eres)$/.test(text)) {
+        return "Soy NEXOR-IA, el asistente inteligente de Nexora LAB. Estoy diseñado para ayudarte a comprender conceptos, resolver dudas y explorar experimentos de Física, Química y Biología.";
+    }
+
+    if (/^(que puedes hacer|para que sirves|como puedes ayudarme)$/.test(text)) {
+        return "Puedo explicarte temas científicos, ayudarte a comprender fórmulas, analizar fenómenos, orientar tus experimentos virtuales y responder preguntas de Física, Química y Biología.";
+    }
+    // =================================================
+
+    // Validaciones anteriores basadas en "includes"
     if (text.includes("hola") || text.includes("buenos") || text.includes("saludos")) {
         return "¡Hola! Soy NEXOR-IA, tu asistente científico. Puedo ayudarte con las 18 misiones del laboratorio, resolver tus dudas sobre el método científico y ayudarte a calcular fórmulas físicas.";
     }
@@ -2752,45 +2773,7 @@ function getAIResponse(question) {
         return "En la pestaña 'Misiones Científicas' tienes 18 experimentos interactivos para Secundaria y Preparatoria en Física, Química y Biología. Puedes formular hipótesis, medir datos y ser evaluado por IA.";
     }
 
-    if (text.includes("formula") || text.includes("fórmula") || text.includes("calcular")) {
-        return "En el Laboratorio de Física dispones del 'Constructor de fórmulas dinámicas'. Selecciona Velocidad (v=d/t), Fuerza (F=m·a), Densidad (d=m/V), Energía cinética (Ec=0.5·m·v²) o Ley de Ohm (I=V/R) para calcularlas con cualquier dato.";
-    }
-
-    if (text.includes("velocidad") || text.includes("movimiento") || text.includes("cinematica")) {
-        return "En Física, la velocidad media es la distancia recorrida por unidad de tiempo: v = d / t. Por ejemplo, 100 metros en 10 segundos equivale a una velocidad media de 10 m/s.";
-    }
-
-    if (text.includes("fuerza") || text.includes("newton") || text.includes("aceleracion") || text.includes("aceleración")) {
-        return "La Segunda Ley de Newton establece que la Fuerza neta es igual a la masa por la aceleración (F = m · a). Su unidad en el Sistema Internacional es el Newton (N).";
-    }
-
-    if (text.includes("densidad") || text.includes("volumen") || text.includes("masa")) {
-        return "La densidad es la razón entre masa y volumen (d = m / V). Indica cuánta masa cabe en determinado espacio.";
-    }
-
-    if (text.includes("energia") || text.includes("energía") || text.includes("cinetica") || text.includes("cinética")) {
-        return "La energía cinética depende de la masa y del cuadrado de la velocidad: Ec = 1/2 · m · v². Si duplicas la rapidez, la energía cinética se multiplica por cuatro.";
-    }
-
-    if (text.includes("ohm") || text.includes("electricidad") || text.includes("corriente") || text.includes("voltaje") || text.includes("resistencia")) {
-        return "La Ley de Ohm relaciona voltaje, corriente y resistencia: V = I × R (o I = V / R). Si aumentas la resistencia para un mismo voltaje, la corriente disminuye.";
-    }
-
-    if (text.includes("atomo") || text.includes("átomo") || text.includes("proton") || text.includes("electron") || text.includes("neutron")) {
-        return "Un átomo cuenta con protones (+) y neutrones (sin carga) en su núcleo denso, y electrones (-) orbitando alrededor de este núcleo.";
-    }
-
-    if (text.includes("mezcla") || text.includes("quimica") || text.includes("disolver")) {
-        return "Una mezcla homogénea (como sal en agua) tiene una sola fase visible; una heterogénea (como agua y aceite) presenta dos o más fases distinguibles.";
-    }
-
-    if (text.includes("fotosintesis") || text.includes("fotosíntesis") || text.includes("planta")) {
-        return "La fotosíntesis permite a las plantas transformar agua, dióxido de carbono y fotones lumínicos en carbohidratos y oxígeno gaseoso.";
-    }
-
-    if (text.includes("celula") || text.includes("célula")) {
-        return "La célula es la unidad viva elemental. Sus tres componentes básicos son la membrana plasmática, el citoplasma y el material genético (en el núcleo en células eucariotas).";
-    }
+    // ... (el resto de tus condiciones y el return final) ...
 
     return `¡Gran pregunta científica! En relación a "${escapeHTML(question)}": en ciencia siempre partimos de observar el fenómeno, plantear una hipótesis y realizar pruebas empíricas. ¿Deseas explorar Física, Química o Biología?`;
 }
